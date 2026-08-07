@@ -24,7 +24,7 @@ if "chat_histories" not in st.session_state:
 if "ai_reports" not in st.session_state:
     st.session_state.ai_reports = {}
 
-# --- CSS STYLING: OVERRIDE TOTAL TOMBOL & FILE UPLOADER ---
+# --- CSS STYLING: BERSIH, KONTRAS, & TEPAT UNTUK DARK MODE ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
@@ -51,6 +51,7 @@ st.markdown("""
         display: none;
     }
     
+    /* Warna teks umum terang & jelas */
     p, span, label, div, .stMarkdown, .stSelectbox label, .stFileUploader label {
         color: #F8FAFC !important;
     }
@@ -64,7 +65,7 @@ st.markdown("""
         color: #E2E8F0 !important;
     }
     
-    /* PAKSA TOMBOL JADI HITAM / PUTIH TERANG DENGAN TEKS JELAS */
+    /* STYLING TOMBOL UMUM */
     div.stButton > button { 
         background: #F8FAFC !important; 
         color: #0F172A !important; 
@@ -81,6 +82,23 @@ st.markdown("""
     }
     div.stButton > button p, div.stButton > button span {
         color: #0F172A !important;
+        font-weight: 700 !important;
+    }
+
+    /* STYLING KHUSUS TOMBOL SUBMIT FORM (UNGGAH KE BRANKAS) */
+    div.stFormSubmitButton > button {
+        background: #6366F1 !important; 
+        color: #FFFFFF !important; 
+        border: none !important;
+        border-radius: 10px !important;
+        font-weight: 700 !important;
+    }
+    div.stFormSubmitButton > button:hover {
+        background: #4F46E5 !important; 
+        color: #FFFFFF !important;
+    }
+    div.stFormSubmitButton > button p, div.stFormSubmitButton > button span {
+        color: #FFFFFF !important;
         font-weight: 700 !important;
     }
 
@@ -103,7 +121,7 @@ st.markdown("""
         border-radius: 10px !important;
     }
     
-    /* FILE UPLOADER KUSTOM SUPAYA TIDAK SILAU / FLOATING ANEH */
+    /* FILE UPLOADER KUSTOM */
     [data-testid="stFileUploader"] {
         background-color: rgba(15, 23, 42, 0.6) !important;
         padding: 12px;
@@ -118,6 +136,7 @@ st.markdown("""
         color: #E2E8F0 !important;
     }
     
+    /* JUDUL DI-SET JADI PUTIH BERSIH */
     h1, h2, h3 { 
         color: #FFFFFF !important; 
         font-weight: 700; 
