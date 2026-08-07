@@ -24,7 +24,7 @@ if "chat_histories" not in st.session_state:
 if "ai_reports" not in st.session_state:
     st.session_state.ai_reports = {}
 
-# --- CSS STYLING: BERSIH, KONTRAS, & TEPAT UNTUK DARK MODE ---
+# --- CSS STYLING: FIX DROPDOWN & TOMBOL UPLOAD JADI BIRU/UNGU ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
@@ -113,15 +113,33 @@ st.markdown("""
         margin-bottom: 20px;
     }
     
-    /* INPUT & SELECTBOX */
+    /* INPUT & SELECTBOX (FIX DROPDOWN SUPAYA TEKS TERLIHAT JELAS) */
     .stTextInput>div>div>input, .stSelectbox>div>div>select {
-        background-color: rgba(255, 255, 255, 0.08) !important;
+        background-color: rgba(15, 23, 42, 0.8) !important;
         color: #FFFFFF !important;
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
         border-radius: 10px !important;
     }
     
-    /* FILE UPLOADER KUSTOM */
+    /* FIX MENU DROPDOWN LIST OPTION */
+    div[data-baseweb="select"] > div {
+        background-color: #0F172A !important;
+        color: #FFFFFF !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+    ul[data-baseweb="menu"] {
+        background-color: #0F172A !important;
+    }
+    li[data-baseweb="option"] {
+        color: #FFFFFF !important;
+        background-color: #0F172A !important;
+    }
+    li[data-baseweb="option"]:hover {
+        background-color: #6366F1 !important;
+        color: #FFFFFF !important;
+    }
+    
+    /* FILE UPLOADER KUSTOM: TOMBOL UPLOAD DI DALAMNYA DIUBAH JADI BIRU/UNGU */
     [data-testid="stFileUploader"] {
         background-color: rgba(15, 23, 42, 0.6) !important;
         padding: 12px;
@@ -134,6 +152,20 @@ st.markdown("""
     }
     [data-testid="stFileUploader"] span, [data-testid="stFileUploader"] small, [data-testid="stFileUploader"] div, [data-testid="stFileUploader"] p {
         color: #E2E8F0 !important;
+    }
+    /* Ubah tombol "Browse files" / "Upload" di dalam uploader jadi biru/ungu */
+    [data-testid="stFileUploader"] button {
+        background: #6366F1 !important;
+        color: #FFFFFF !important;
+        border: none !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+    }
+    [data-testid="stFileUploader"] button:hover {
+        background: #4F46E5 !important;
+    }
+    [data-testid="stFileUploader"] button p, [data-testid="stFileUploader"] button span {
+        color: #FFFFFF !important;
     }
     
     /* JUDUL DI-SET JADI PUTIH BERSIH */
