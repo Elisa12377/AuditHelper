@@ -6,7 +6,11 @@ import os
 import google.generativeai as genai
 
 # --- KONFIGURASI AI ---
-api_key = st.secrets.get("GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY", "GANTI_DENGAN_KEY_KAMU")
+try:
+    api_key = st.secrets.get("GEMINI_API_KEY")
+except Exception:
+    api_key = os.environ.get("GEMINI_API_KEY", "GANTI_DENGAN_KEY_KAMU")
+
 genai.configure(api_key=api_key)
 ai_model = genai.GenerativeModel('gemini-3.5-flash')
 
@@ -56,7 +60,7 @@ if "chat_histories" not in st.session_state:
 if "ai_reports" not in st.session_state:
     st.session_state.ai_reports = {}
 
-# --- CSS STYLING: TAMPILAN GELAP ELEGAN & KONTRAS ---
+# --- CSS STYLING: TAMPILAN GELAP ELEGAN, KONTRAS, & FIX DROPDOWN ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
@@ -148,17 +152,19 @@ st.markdown("""
         border-radius: 10px !important;
     }
     
-    div[data-baseweb="select"] > div {
-        background-color: #0F172A !important;
+    /* FIX TOTAL WARNA TEKS DI DALAM DROPDOWN SELECTBOX */
+    div[data-baseweb="select"] span {
         color: #FFFFFF !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+    div[data-baseweb="popover"] div, ul[data-baseweb="menu"] li, span[data-baseweb="tag"] {
+        color: #0F172A !important;
     }
     ul[data-baseweb="menu"] {
-        background-color: #0F172A !important;
+        background-color: #F8FAFC !important;
     }
     li[data-baseweb="option"] {
-        color: #FFFFFF !important;
-        background-color: #0F172A !important;
+        background-color: #F8FAFC !important;
+        color: #0F172A !important;
     }
     li[data-baseweb="option"]:hover {
         background-color: #6366F1 !important;
