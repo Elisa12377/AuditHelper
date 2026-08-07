@@ -3,6 +3,7 @@ import pandas as pd
 import sqlite3
 import hashlib
 import os
+import io
 import google.generativeai as genai
 
 # --- KONFIGURASI AI ---
@@ -38,19 +39,23 @@ def check_user(username, password):
 def add_user(username, password):
     c = db_conn.cursor()
     try:
-        c.execute("INSERT INTO users(usersname, password) VALUES (?, ?)" if False else "INSERT INTO users(username, password) VALUES (?, ?)", (username, make_hash(password)))
+        c.execute("INSERT INTO users(username, password) VALUES (?, ?)", (username, make_hash(password)))
         db_conn.commit()
         return True
     except:
         return False
 
-# --- FUNGSI PEMBERSIH EXCEL & DETEKSI HEADER (DENGAN PILIHAN SHEET) ---
+# --- FUNGSI PEMBERSIH EXCEL & DETEKSI SHEET/HEADER ---
 def get_excel_sheets(uploaded_file):
-    xl = pd.ExcelFile(uploaded_file)
-    return xl.sheet_names
+    try:
+        xl = pd.ExcelFile(uploaded_file)
+        return xl.sheet_names
+    except Exception:
+        uploaded_file.seek(0)
+        xl = pd.ExcelFile(uploaded_file, engine='openpyxl')
+        return xl.sheet_names
 
 def clean_and_detect_header(uploaded_file, sheet_name):
-    # Baca file mentah berdasarkan sheet yang dipilih
     try:
         raw_df = pd.read_excel(uploaded_file, sheet_name=sheet_name, header=None, dtype=str)
     except Exception:
@@ -58,7 +63,7 @@ def clean_and_detect_header(uploaded_file, sheet_name):
         raw_df = pd.read_excel(uploaded_file, sheet_name=sheet_name, header=None, engine='openpyxl', dtype=str)
     
     header_row_idx = 0
-    keywords = ['tanggal', 'date', 'akun', 'account', 'keterangan', 'description', 'debit', 'credit', 'kredit', 'ref']
+    keywords = ['tanggal', 'date', 'akun', 'account', 'keterangan', 'description', 'debit', 'credit', 'kredit', 'ref', 'penyusutan', 'ppn']
     
     for idx in range(min(15, len(raw_df))):
         row_str = " ".join(raw_df.iloc[idx].dropna().astype(str).values).lower()
@@ -66,7 +71,6 @@ def clean_and_detect_header(uploaded_file, sheet_name):
             header_row_idx = idx
             break
             
-    # Load ulang dengan header yang terdeteksi
     uploaded_file.seek(0)
     try:
         df = pd.read_excel(uploaded_file, sheet_name=sheet_name, header=header_row_idx, dtype=str)
@@ -180,7 +184,22 @@ st.markdown("""
         margin-bottom: 20px;
     }
     
-    .stTextInput>div>div>input, .stSelectbox>div>div>select {
+    .stTextInput input, .stChatInput input, textarea, div[data-baseweb="input"] input {
+        background-color: #F8FAFC !important;
+        color: #0F172A !important;
+        -webkit-text-fill-color: #0F172A !important;
+        font-weight: 600 !important;
+    }
+    
+    textarea[aria-label="Draf Laporan Resmi / KKA (Siap Salin):"] {
+        background-color: #0F172A !important;
+        color: #FFFFFF !important;
+        -webkit-text-fill-color: #FFFFFF !important;
+        font-size: 1rem !important;
+        border: 1px solid #6366F1 !important;
+    }
+    
+    .stSelectbox>div>div>select {
         background-color: rgba(15, 23, 42, 0.8) !important;
         color: #FFFFFF !important;
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
@@ -228,19 +247,6 @@ st.markdown("""
     }
     [data-testid="stFileUploader"] span, [data-testid="stFileUploader"] small, [data-testid="stFileUploader"] div, [data-testid="stFileUploader"] p {
         color: #E2E8F0 !important;
-    }
-    [data-testid="stFileUploader"] button {
-        background: #6366F1 !important;
-        color: #FFFFFF !important;
-        border: none !important;
-        border-radius: 8px !important;
-        font-weight: 600 !important;
-    }
-    [data-testid="stFileUploader"] button:hover {
-        background: #4F46E5 !important;
-    }
-    [data-testid="stFileUploader"] button p, [data-testid="stFileUploader"] button span {
-        color: #FFFFFF !important;
     }
     
     h1, h2, h3 { 
@@ -368,14 +374,14 @@ else:
         
         tab_w1, tab_w2, tab_w3 = st.tabs([
             "📂 1. Document Vault (Input Data)", 
-            "📊 2. Analytics, Filter & Materialitas", 
+            "📊 2. Parameter & Rules Audit (Filter)", 
             "🤖 3. AI Copilot & Reporting"
         ])
 
         with tab_w1:
             st.markdown("<div class='glass-box'>", unsafe_allow_html=True)
             st.subheader("Pusat Unggah Dokumen Klien (Private Vault)")
-            st.info("Pilih file Excel Anda. Sistem otomatis mendeteksi sheet dan header dari 15 baris pertama.")
+            st.info("Pilih file Excel Anda. Sistem otomatis mendeteksi sheet, header, dan mendukung kategori dokumen kustom.")
             
             f_dok = st.file_uploader("Pilih File Excel (.xlsx / .xls):", type=["xlsx", "xls"])
             
@@ -383,7 +389,14 @@ else:
                 try:
                     sheet_names = get_excel_sheets(f_dok)
                     selected_sheet = st.selectbox("Pilih Sheet / Lembar Kerja Excel:", sheet_names)
-                    j_dok = st.selectbox("Kategori Dokumen:", ["General Ledger (GL)", "Trial Balance (TB)", "Rekening Koran (Bank)", "Stock Opname", "Cash Opname", "Lainnya"])
+                    
+                    j_dok_pilihan = st.selectbox("Kategori Dokumen:", ["General Ledger (GL)", "Trial Balance (TB)", "Rekening Koran (Bank)", "Rincian Penyusutan Aset Tetap", "Ekualisasi Pajak (PPN/PPh)", "Stock Opname", "Lainnya"])
+                    
+                    if j_dok_pilihan == "Lainnya":
+                        custom_doc_name = st.text_input("Ketik Nama / Jenis Dokumen Custom:", placeholder="Misal: Buku Besar Piutang Usaha")
+                        j_dok = custom_doc_name if custom_doc_name else "Dokumen Lainnya"
+                    else:
+                        j_dok = j_dok_pilihan
                     
                     if st.button("🚀 Proses & Unggah ke Brankas Data"):
                         df_v, detected_row = clean_and_detect_header(f_dok, selected_sheet)
@@ -391,12 +404,12 @@ else:
                         if klien_ini not in st.session_state.client_vault:
                             st.session_state.client_vault[klien_ini] = []
                         st.session_state.client_vault[klien_ini].append({
-                            "nama_file": f"{f_dok.name} ({selected_sheet})",
+                            "nama_file": f"{f_dok.name} [{selected_sheet}]",
                             "jenis": j_dok,
                             "data": df_v,
                             "total_baris": len(df_v)
                         })
-                        st.success(f"Berhasil mengunggah lembar '{selected_sheet}'! Header terdeteksi pada baris ke-{detected_row + 1}.")
+                        st.success(f"Berhasil mengunggah dokumen '{j_dok}'! Header terdeteksi pada baris ke-{detected_row + 1}.")
                 except Exception as e:
                     st.error(f"Gagal memproses file: {e}")
             st.markdown("</div>", unsafe_allow_html=True)
@@ -412,75 +425,70 @@ else:
 
         with tab_w2:
             st.markdown("<div class='glass-box'>", unsafe_allow_html=True)
-            st.subheader("Analytics Engine, Filter & Materialitas Audit")
+            st.subheader("⚡ Parameter & Rules Audit")
             v_data = st.session_state.client_vault.get(klien_ini, [])
             if v_data:
                 f_names = [d['nama_file'] for d in v_data]
                 p_file = st.selectbox("Pilih file arsip untuk dianalisis:", f_names, key="filter_file_select")
                 s_doc = next(d for d in v_data if d['nama_file'] == p_file)
                 
-                df_to_show = s_doc['data']
+                df_original = s_doc['data']
+                df_to_show = df_original.copy()
                 col_cols = df_to_show.columns.tolist()
                 
-                # Pemilihan Kolom Debit & Kredit untuk Pengujian Analitis
-                st.markdown("#### ⚙️ Pengaturan Kolom Analisis Keuangan")
-                c_deb1, c_deb2 = st.columns(2)
-                
-                # Deteksi otomatis kandidat kolom debit/kredit
-                debit_candidates = [c for c in col_cols if any(k in c.lower() for k in ['debit', 'db', 'masuk'])]
-                credit_candidates = [c for c in col_cols if any(k in c.lower() for k in ['kredit', 'credit', 'cr', 'keluar'])]
-                
-                def_debit = debit_candidates[0] if debit_candidates else col_cols[0]
-                def_credit = credit_candidates[0] if credit_candidates else col_cols[min(1, len(col_cols)-1)]
-                
-                with c_deb1:
-                    col_debit = st.selectbox("Pilih Kolom Debit:", col_cols, index=col_cols.index(def_debit) if def_debit in col_cols else 0)
-                with c_deb2:
-                    col_kredit = st.selectbox("Pilih Kolom Kredit:", col_cols, index=col_cols.index(def_credit) if def_credit in col_cols else 0)
-                
-                # Coba hitung total nilai jika kolom berupa angka
-                try:
-                    total_debit = pd.to_numeric(df_to_show[col_debit].astype(str).str.replace(r'[^0-9.-]', '', regex=True), errors='coerce').sum()
-                    total_kredit = pd.to_numeric(df_to_show[col_kredit].astype(str).str.replace(r'[^0-9.-]', '', regex=True), errors='coerce').sum()
-                    
-                    st.info(f"📊 **Ringkasan Total Data Ini** — Total Debit: `Rp {total_debit:,.0f}` | Total Kredit: `Rp {total_kredit:,.0f}`")
-                except Exception:
-                    pass
-
-                st.markdown("---")
-
-                # Kalkulator Materialitas
-                st.markdown("#### 📐 Kalkulator Materialitas Audit")
-                col_m1, col_m2, col_m3 = st.columns(3)
-                with col_m1:
-                    basis_audit = st.number_input("Base Value (Total Aset/Pendapatan):", value=1000000000, step=10000000)
-                with col_m2:
-                    persen_mat = st.slider("Tingkat Materialitas (%):", min_value=0.5, max_value=5.0, value=1.0, step=0.5)
-                with col_m3:
-                    nilai_materialitas = basis_audit * (persen_mat / 100)
-                    st.metric("Batas Materialitas (OM):", f"Rp {nilai_materialitas:,.0f}")
-                
-                st.markdown("---")
-                
-                # Deteksi Baris / Deskripsi Kosong
-                st.markdown("#### 🔎 Filter & Deteksi Anomali (Deskripsi Kosong)")
-                desc_col_candidates = [c for c in col_cols if any(k in c.lower() for k in ['ket', 'keterangan', 'desc', 'deskripsi', 'uraian', 'memo'])]
-                default_desc_col = desc_col_candidates[0] if desc_col_candidates else col_cols[0]
-                
-                selected_desc_col = st.selectbox("Pilih Kolom Deskripsi/Keterangan untuk Dicek:", col_cols, index=col_cols.index(default_desc_col))
-                
-                filter_mode = st.radio("Mode Tampilan Data:", ["Semua Data", "Hanya Tampilkan Baris dengan Deskripsi Kosong/Blank"], horizontal=True)
-                
-                if filter_mode == "Hanya Tampilkan Baris dengan Deskripsi Kosong/Blank":
-                    df_to_show = df_to_show[df_to_show[selected_desc_col].str.strip() == ""]
-                    st.warning(f"Ditemukan {len(df_to_show)} baris transaksi dengan deskripsi kosong!")
-
-                keyword = st.text_input("Cari data (berdasarkan kata kunci teks/angka):", placeholder="Ketik kata kunci...")
-                if keyword:
-                    mask = df_to_show.apply(lambda row: row.astype(str).str.contains(keyword, case=False).any(), axis=1)
+                global_search = st.text_input("🔍 Cari transaksi...", placeholder="Ketik kata kunci pencarian bebas...")
+                if global_search:
+                    mask = df_to_show.apply(lambda row: row.astype(str).str.contains(global_search, case=False).any(), axis=1)
                     df_to_show = df_to_show[mask]
-                    st.info(f"Ditemukan: {len(df_to_show)} baris dari pencarian '{keyword}'.")
+
+                st.markdown("---")
+                st.markdown("#### ⚡ Parameter & Rules Audit")
                 
+                col_mat_col = st.selectbox("Pilih kolom nominal/saldo:", col_cols)
+                batas_materialitas = st.number_input("Batas Materialitas (Rp)", value=100000000, step=1000000)
+                aktifkan_materialitas = st.checkbox("🚨 Aktifkan Filter Materialitas")
+                
+                if aktifkan_materialitas:
+                    try:
+                        numeric_s = pd.to_numeric(df_to_show[col_mat_col].astype(str).str.replace(r'[^0-9.-]', '', regex=True), errors='coerce').fillna(0)
+                        df_to_show = df_to_show[abs(numeric_s) >= batas_materialitas]
+                    except Exception:
+                        pass
+
+                col_ket_col = st.selectbox("Pilih kolom Keterangan/Deskripsi:", col_cols, key="sel_ket_col")
+                aktifkan_ket_kosong = st.checkbox("🎯 Aktifkan Filter Ket. Kosong")
+                
+                if aktifkan_ket_kosong:
+                    df_to_show = df_to_show[df_to_show[col_ket_col].str.strip() == ""]
+
+                st.markdown("---")
+                st.markdown("#### 💀 Deteksi Anomali Otomatis")
+                
+                deteksi_weekend = st.checkbox("📅 Deteksi Transaksi Weekend (Sabtu / Minggu)")
+                deteksi_bulat = st.checkbox("🎯 Deteksi Angka Bulat Mencurigakan (Kelipatan 1 Juta)")
+                
+                col_duplikasi = st.selectbox("Pilih kolom acuan Duplikasi (Contoh: No Jurnal, Akun, atau Ref):", col_cols)
+                deteksi_duplikat = st.checkbox("🔄 Deteksi Nilai Kembar Berdasarkan Kolom Terpilih")
+                
+                if deteksi_bulat:
+                    try:
+                        nums = pd.to_numeric(df_to_show[col_mat_col].astype(str).str.replace(r'[^0-9.-]', '', regex=True), errors='coerce').fillna(0)
+                        df_to_show = df_to_show[(nums != 0) & (nums % 1000000 == 0)]
+                    except Exception:
+                        pass
+                        
+                if deteksi_duplikat and col_duplikasi:
+                    df_to_show = df_to_show[df_to_show.duplicated(subset=[col_duplikasi], keep=False)]
+
+                st.markdown("---")
+                
+                c_stat1, c_stat2 = st.columns(2)
+                with c_stat1:
+                    st.markdown(f"<p style='color: #94a3b8; font-size: 0.9rem;'>Total Data Asli</p><h2 style='color: #ffffff;'>{len(df_original)} Baris</h2>", unsafe_allow_html=True)
+                with c_stat2:
+                    st.markdown(f"<p style='color: #94a3b8; font-size: 0.9rem;'>Temuan Saringan</p><h2 style='color: #818cf8;'>{len(df_to_show)} Baris</h2>", unsafe_allow_html=True)
+                
+                st.markdown("#### 📂 Preview Temuan")
                 st.dataframe(df_to_show, use_container_width=True, height=350)
             else:
                 st.info("Silakan lakukan upload dokumen di Tab 1 terlebih dahulu.")
@@ -492,7 +500,7 @@ else:
             v_data = st.session_state.client_vault.get(klien_ini, [])
             
             if klien_ini not in st.session_state.chat_histories:
-                st.session_state.chat_histories[klien_ini] = [{"role": "ai", "content": f"Halo {current_user}! Saya AI Copilot untuk penugasan {klien_ini}. Silakan tanyakan analisis atau minta penyusunan draf KKA."}]
+                st.session_state.chat_histories[klien_ini] = [{"role": "ai", "content": f"Halo {current_user}! Saya AI Copilot untuk penugasan {klien_ini}. Silakan tanyakan analisis, pengujian penyusunan ekualisasi, atau minta draf KKA."}]
                 
             chat_box = st.container(height=350)
             with chat_box:
@@ -500,7 +508,7 @@ else:
                     with st.chat_message(chat["role"]):
                         st.write(chat["content"])
 
-            u_input = st.chat_input("Ketik pertanyaan audit / minta buatkan KKA...")
+            u_input = st.chat_input("Ketik pertanyaan audit / minta analisis ekualisasi / buatkan KKA...")
             if u_input:
                 st.session_state.chat_histories[klien_ini].append({"role": "user", "content": u_input})
                 with chat_box:
@@ -516,7 +524,7 @@ else:
                                     ctx += f"\n- {d['jenis']} ({d['nama_file']}): {d['data'].head(15).to_dict(orient='records')}\n"
                                 if not ctx: ctx = "Belum ada dokumen."
                                 
-                                prompt_ai = f"Anda adalah Senior AI Audit untuk {klien_ini}. Data: {ctx}. Pertanyaan: {u_input}"
+                                prompt_ai = f"Anda adalah Senior AI Audit untuk {klien_ini}. Data: {ctx}. Pertanyaan/Instruksi Auditor: {u_input}"
                                 resp = ai_model.generate_content(prompt_ai)
                                 ans = resp.text
                             except Exception as e:
@@ -542,4 +550,30 @@ else:
 
                 if klien_ini in st.session_state.ai_reports:
                     st.text_area("Draf Laporan Resmi / KKA (Siap Salin):", value=st.session_state.ai_reports[klien_ini], height=250)
+                    
+                    report_text = st.session_state.ai_reports[klien_ini]
+                    b_bytes = report_text.encode('utf-8')
+                    
+                    col_dl1, col_dl2 = st.columns(2)
+                    with col_dl1:
+                        st.download_button(
+                            label="📥 Unduh KKA (Format Teks/Word .txt)",
+                            data=b_bytes,
+                            file_name=f"KKA_{klien_ini.replace(' ', '_')}.txt",
+                            mime="text/plain"
+                        )
+                    with col_dl2:
+                        output = io.BytesIO()
+                        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                            lines = report_text.split('\n')
+                            df_report_export = pd.DataFrame({"Kertas Kerja Audit (KKA) & Laporan Eksekutif": lines})
+                            df_report_export.to_excel(writer, index=False, sheet_name='KKA_Summary')
+                        output.seek(0)
+                        
+                        st.download_button(
+                            label="📥 Unduh KKA (Format Excel .xlsx)",
+                            data=output,
+                            file_name=f"KKA_{klien_ini.replace(' ', '_')}.xlsx",
+                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        )
             st.markdown("</div>", unsafe_allow_html=True)
