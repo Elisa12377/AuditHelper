@@ -24,7 +24,7 @@ if "chat_histories" not in st.session_state:
 if "ai_reports" not in st.session_state:
     st.session_state.ai_reports = {}
 
-# --- CSS STYLING: PERBAIKAN KONTRAS TEKS & TOMBOL FORM ---
+# --- CSS STYLING: PERBAIKAN WARNA TOMBOL & TEKS ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
@@ -33,7 +33,6 @@ st.markdown("""
         font-family: 'Space Grotesk', sans-serif; 
     }
     
-    /* Hilangkan total header / poni putih bawaan Streamlit */
     header[data-testid="stHeader"] {
         background: transparent !important;
         display: none !important;
@@ -42,7 +41,6 @@ st.markdown("""
         display: none !important;
     }
     
-    /* Background Gradient Gelap */
     .stApp { 
         background: linear-gradient(135deg, #05070B 0%, #0D1124 50%, #150F2D 100%);
         color: #FFFFFF; 
@@ -53,12 +51,10 @@ st.markdown("""
         display: none;
     }
     
-    /* Paksa semua teks umum menjadi terang & jelas */
     p, span, label, div, .stMarkdown, .stSelectbox label, .stFileUploader label {
         color: #F8FAFC !important;
     }
     
-    /* Kotak Info/Alert */
     .stAlert {
         background-color: rgba(99, 102, 241, 0.15) !important;
         color: #E2E8F0 !important;
@@ -68,23 +64,27 @@ st.markdown("""
         color: #E2E8F0 !important;
     }
     
-    /* TOMBOL UTAMA: Pastikan teks di dalamnya selalu putih pekat */
+    /* TOMBOL UTAMA: Background putih/terang dengan teks HITAM tebal, tanpa efek berubah warna saat hover */
     .stButton>button { 
-        background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%) !important; 
-        color: #FFFFFF !important; 
-        border-radius: 14px !important; 
+        background: #FFFFFF !important; 
+        color: #000000 !important; 
+        border-radius: 12px !important; 
         border: none !important;
-        font-weight: 600 !important;
-        padding: 0.65rem 1.5rem !important;
-        box-shadow: 0 4px 25px rgba(99, 102, 241, 0.45);
-        transition: all 0.3s ease;
+        font-weight: 700 !important;
+        padding: 0.6rem 1.4rem !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        transition: none !important;
+        transform: none !important;
     }
-    .stButton>button p, .stButton>button span {
-        color: #FFFFFF !important;
+    .stButton>button p, .stButton>button span, .stButton>button div {
+        color: #000000 !important;
+        font-weight: 700 !important;
     }
     .stButton>button:hover { 
-        transform: translateY(-2px);
-        box-shadow: 0 6px 30px rgba(99, 102, 241, 0.7);
+        background: #F1F5F9 !important;
+        color: #000000 !important;
+        transform: none !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
     }
     
     /* KARTU GLASSMORPHISM */
@@ -98,7 +98,7 @@ st.markdown("""
         margin-bottom: 20px;
     }
     
-    /* INPUT & SELECTBOX: Perjelas teks di dalam form input */
+    /* INPUT & SELECTBOX */
     .stTextInput>div>div>input, .stSelectbox>div>div>select {
         background-color: rgba(255, 255, 255, 0.06) !important;
         color: #FFFFFF !important;
@@ -106,13 +106,13 @@ st.markdown("""
         border-radius: 12px !important;
     }
     
-    /* FILE UPLOADER: Perjelas teks petunjuk upload */
+    /* FILE UPLOADER */
     [data-testid="stFileUploader"] section {
         background-color: rgba(255, 255, 255, 0.04) !important;
         border: 1px dashed rgba(255, 255, 255, 0.2) !important;
     }
-    [data-testid="stFileUploader"] span, [data-testid="stFileUploader"] small, [data-testid="stFileUploader"] div {
-        color: #CBD5E1 !important;
+    [data-testid="stFileUploader"] span, [data-testid="stFileUploader"] small, [data-testid="stFileUploader"] div, [data-testid="stFileUploader"] p {
+        color: #FFFFFF !important;
     }
     
     h1, h2, h3 { 
@@ -146,7 +146,7 @@ if st.session_state.active_room is None:
     if st.button("🚀 Get Started / New Company"):
         st.session_state.active_room = "SETUP_NEW_CLIENT"
         st.rerun()
-    st.markdown("️</center>", unsafe_allow_html=True)
+    st.markdown("</center>", unsafe_allow_html=True)
     
     st.markdown("<br><br>", unsafe_allow_html=True)
     
