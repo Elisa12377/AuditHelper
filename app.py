@@ -24,7 +24,7 @@ if "chat_histories" not in st.session_state:
 if "ai_reports" not in st.session_state:
     st.session_state.ai_reports = {}
 
-# --- CSS STYLING MODERN (DARK BLUE / PURPLE GRADIENT ALA REFERENSI) ---
+# --- CSS STYLING MODERN (DARK BLUE / PURPLE GRADIENT) ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap');
@@ -33,18 +33,15 @@ st.markdown("""
         font-family: 'Space Grotesk', sans-serif; 
     }
     
-    /* Background Utama ala Dark Gradient */
     .stApp { 
         background: linear-gradient(135deg, #090B10 0%, #111425 50%, #1A1333 100%);
         color: #FFFFFF; 
     }
     
-    /* Sembunyikan sidebar bawaan agar fokus ke UI custom */
     [data-testid="stSidebar"] {
         display: none;
     }
     
-    /* Tombol Kustom */
     .stButton>button { 
         background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%) !important; 
         color: #FFFFFF !important; 
@@ -60,16 +57,6 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
     }
     
-    /* Kartu Glassmorphism */
-    .glass-card {
-        background: rgba(255, 255, 255, 0.03);
-        backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 16px;
-        padding: 24px;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    }
-    
     h1, h2, h3 { 
         color: #FFFFFF; 
         font-weight: 700; 
@@ -81,9 +68,7 @@ st.markdown("""
 # ================= KONTROL HALAMAN =================
 
 if st.session_state.active_room is None:
-    # --- HOME / LANDING PAGE ALA SALFORD & CO ---
-    
-    # Navbar Header Sederhana
+    # --- LANDING PAGE / DASHBOARD UTAMA ---
     col_nav1, col_nav2, col_nav3 = st.columns([3, 6, 2])
     with col_nav1:
         st.markdown("### ✈️ **AUDITPILOT & CO.**")
@@ -94,13 +79,11 @@ if st.session_state.active_room is None:
 
     st.markdown("<br><br>", unsafe_allow_html=True)
     
-    # Hero Section Tengah
     st.markdown("<h1 style='text-align: center; font-size: 3.5rem; background: linear-gradient(to right, #ffffff, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>Manage Your Audit Smarter</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 1.2rem; max-width: 600px; margin: 0 auto;'>Stay organized, connected, and productive with one powerful AI-driven platform designed to simplify your financial audits.</p>", unsafe_allow_html=True)
     
     st.markdown("<br><br>", unsafe_allow_html=True)
     
-    # Dashboard Preview / Engagement Manager Section
     col_home1, col_home2 = st.columns([1.2, 1])
     
     with col_home1:
@@ -130,10 +113,10 @@ if st.session_state.active_room is None:
                     st.rerun()
 
 else:
-    # --- WORKSPACE KLIEN (HALAMAN UTAMA SETELAH MASUK) ---
+    # --- WORKSPACE KLIEN ---
     klien_ini = st.session_state.active_room
     
-    col_ top1, col_top2 = st.columns([7, 2])
+    col_top1, col_top2 = st.columns([7, 2])
     with col_top1:
         st.markdown(f"## ✈️ Workspace: **{klien_ini}**")
     with col_top2:
@@ -143,7 +126,6 @@ else:
             
     st.markdown("<hr style='border-color: rgba(255,255,255,0.1);'>", unsafe_allow_html=True)
     
-    # Alur Tab Step-by-Step
     tab_w1, tab_w2, tab_w3 = st.tabs([
         "📂 1. Document Vault (Brankas)", 
         "📊 2. Analytics Engine", 
@@ -152,7 +134,7 @@ else:
 
     with tab_w1:
         st.subheader("Pusat Unggah Dokumen Klien")
-        st.info("Unggah dokumen secara bertahap (GL, TB, Rekening Koran, Stock Opname, dll.). Sistem akan merangkumnya secara otomatis untuk AI.")
+        st.info("Unggah dokumen secara bertahap (GL, TB, Rekening Koran, Stock Opname, dll.).")
         
         with st.form(key=f"ws_upload_{klien_ini}", clear_on_submit=True):
             uc1, uc2 = st.columns(2)
