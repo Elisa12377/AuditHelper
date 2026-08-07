@@ -24,10 +24,10 @@ if "chat_histories" not in st.session_state:
 if "ai_reports" not in st.session_state:
     st.session_state.ai_reports = {}
 
-# --- CSS STYLING VISUAL MODERN ALA REFERENSI GAMBAR ---
+# --- CSS STYLING PREMIUM (HIGH-END SAAS / GLASSMORPHISM) ---
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
     
     html, body, [class*="css"] { 
         font-family: 'Space Grotesk', sans-serif; 
@@ -43,30 +43,39 @@ st.markdown("""
         display: none;
     }
     
-    /* Tombol Utama Gradasi Ungu-Biru */
+    /* Tombol Utama Gradasi Ungu-Biru Glowing */
     .stButton>button { 
         background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%) !important; 
         color: #FFFFFF !important; 
         border-radius: 14px; 
         border: none;
         font-weight: 600;
-        padding: 0.6rem 1.4rem;
-        box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        padding: 0.65rem 1.5rem;
+        box-shadow: 0 4px 25px rgba(99, 102, 241, 0.45);
         transition: all 0.3s ease;
     }
     .stButton>button:hover { 
         transform: translateY(-2px);
-        box-shadow: 0 6px 25px rgba(99, 102, 241, 0.7);
+        box-shadow: 0 6px 30px rgba(99, 102, 241, 0.7);
     }
     
-    /* Kartu Efek Kaca (Glassmorphism) */
+    /* Kartu Efek Kaca (Glassmorphism Box) */
     .glass-box {
         background: rgba(255, 255, 255, 0.03);
         backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 20px;
-        padding: 24px;
+        padding: 28px;
         box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+        margin-bottom: 20px;
+    }
+    
+    /* Input Field Kustom */
+    .stTextInput>div>div>input, .stSelectbox>div>div>select {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        color: #FFFFFF !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 12px !important;
     }
     
     h1, h2, h3 { 
@@ -80,17 +89,15 @@ st.markdown("""
 # ================= KONTROL ALUR APLIKASI =================
 
 if st.session_state.active_room is None:
-    # --- 1. LANDING PAGE / COVER UTAMA (MENYERUPAI REFERENSI) ---
+    # --- 1. LANDING PAGE / COVER UTAMA ---
     
-    # Header Navigasi Sederhana
-    c_nav1, c_nav2, c_nav3, c_nav4 = st.columns([2, 4, 2, 2])
+    c_nav1, c_nav2, c_nav3 = st.columns([3, 6, 2])
     with c_nav1:
         st.markdown("### ✈️ **AUDITPILOT & CO.**")
     with c_nav2:
-        st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 0.95rem; margin-top: 10px;'>Home &nbsp;&nbsp;|&nbsp;&nbsp; Features &nbsp;&nbsp;|&nbsp;&nbsp; How it Works</p>", unsafe_allow_html=True)
-    with c_nav4:
-        # Tombol aksi utama menuju Setup Klien
-        if st.button("Contact / Launch"):
+        st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 0.95rem; margin-top: 10px;'>Home &nbsp;&nbsp;|&nbsp;&nbsp; Features &nbsp;&nbsp;|&nbsp;&nbsp; Analytics Engine</p>", unsafe_allow_html=True)
+    with c_nav3:
+        if st.button("Launch App"):
             st.session_state.active_room = "SETUP_NEW_CLIENT"
             st.rerun()
 
@@ -104,18 +111,18 @@ if st.session_state.active_room is None:
     if st.button("🚀 Get Started / New Company"):
         st.session_state.active_room = "SETUP_NEW_CLIENT"
         st.rerun()
-    st.markdown("️</center>", unsafe_allow_html=True)
+    st.markdown("</center>", unsafe_allow_html=True)
     
     st.markdown("<br><br>", unsafe_allow_html=True)
     
-    # Dekorasi Kartu Statistik / Visual Grafik Bawah ala Desain Referensi
+    # Kartu Statistik Modern ala Cover Referensi
     col_stat1, col_stat2, col_stat3 = st.columns(3)
     
     with col_stat1:
         st.markdown("""
         <div class="glass-box">
             <h3 style="color: #818cf8; margin-bottom: 5px;">1.5 M+</h3>
-            <p style="color: #94a3b8; font-size: 0.9rem; margin:0;">Trusted records analyzed by auditors worldwide.</p>
+            <p style="color: #94a3b8; font-size: 0.9rem; margin:0;">Trusted financial records analyzed globally.</p>
         </div>
         """, unsafe_allow_html=True)
         
@@ -123,7 +130,7 @@ if st.session_state.active_room is None:
         st.markdown("""
         <div class="glass-box" style="text-align: center;">
             <h3 style="color: #34d399; margin-bottom: 5px;">93% Accuracy</h3>
-            <p style="color: #94a3b8; font-size: 0.9rem; margin:0;">AI Audit Compliance & Anomaly Rating Score.</p>
+            <p style="color: #94a3b8; font-size: 0.9rem; margin:0;">AI Compliance & Anomaly Risk Score.</p>
         </div>
         """, unsafe_allow_html=True)
         
@@ -131,12 +138,12 @@ if st.session_state.active_room is None:
         st.markdown("""
         <div class="glass-box">
             <h3 style="color: #f43f5e; margin-bottom: 5px;">120 K+</h3>
-            <p style="color: #94a3b8; font-size: 0.9rem; margin:0;">Automated Working Papers (KKA) Generated.</p>
+            <p style="color: #94a3b8; font-size: 0.9rem; margin:0;">Automated Working Papers Generated.</p>
         </div>
         """, unsafe_allow_html=True)
 
 elif st.session_state.active_room == "SETUP_NEW_CLIENT":
-    # --- 2. FORM PEMBUATAN / PEMILIHAN KLIEN BARU (NEW COMPANY) ---
+    # --- 2. SETUP / NEW COMPANY FORM ---
     col_top_back, _ = st.columns([1, 6])
     with col_top_back:
         if st.button("⬅️ Back to Home"):
@@ -148,13 +155,13 @@ elif st.session_state.active_room == "SETUP_NEW_CLIENT":
     col_form1, col_form2 = st.columns(2)
     with col_form1:
         st.markdown("<div class='glass-box'>", unsafe_allow_html=True)
-        st.subheader("🏢 Buat Ruang Perusahaan Baru (New Company)")
-        st.markdown("Masukkan nama entitas klien dan periode tahun buku untuk memulai investigasi.")
+        st.subheader("🏢 Buat Perusahaan Baru (New Company)")
+        st.markdown("Daftarkan entitas klien baru untuk membuka ruang kerja investigasi.")
         
         with st.form(key="form_new_comp"):
-            nama_perusahaan = st.text_input("Nama Perusahaan Klien:", placeholder="Misal: PT Berkah Sejahtera Tbk")
+            nama_perusahaan = st.text_input("Nama Perusahaan Klien:", placeholder="Misal: PT Nusantara Jaya Tbk")
             tahun_audit = st.text_input("Periode Tahun Buku:", placeholder="2026")
-            sub_comp = st.form_submit_button("Inisialisasi Workspace Klien")
+            sub_comp = st.form_submit_button("Inisialisasi Workspace")
             
             if sub_comp and nama_perusahaan:
                 full_room_name = f"{nama_perusahaan} ({tahun_audit})"
@@ -166,42 +173,42 @@ elif st.session_state.active_room == "SETUP_NEW_CLIENT":
 
     with col_form2:
         st.markdown("<div class='glass-box'>", unsafe_allow_html=True)
-        st.subheader("📂 Atau Pilih Klien yang Sudah Ada")
+        st.subheader("📂 Pilih Klien Terdaftar")
         for room in st.session_state.rooms:
             c_r1, c_r2 = st.columns([3, 1])
             with c_r1:
                 st.write(f"**{room}**")
             with c_r2:
-                if st.button("Masuk", key=f"select_exist_{room}"):
+                if st.button("Buka", key=f"select_exist_{room}"):
                     st.session_state.active_room = room
                     st.rerun()
             st.markdown("<hr style='border-color: rgba(255,255,255,0.05);'>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
 else:
-    # --- 3 & 4. WORKSPACE UTAMA: UPLOAD, ANALYTICS, AI COPILOT & REPORT ---
+    # --- 3. WORKSPACE UTAMA (VAULT, ANALYTICS, AI COPILOT) ---
     klien_ini = st.session_state.active_room
     
     col_top_w1, col_top_w2 = st.columns([7, 2])
     with col_top_w1:
-        st.markdown(f"## ✈️ Workspace Klien: **{klien_ini}**")
+        st.markdown(f"## ✈️ Workspace: **{klien_ini}**")
     with col_top_w2:
-        if st.button("🚪 Keluar / Ganti Klien"):
+        if st.button("🚪 Keluar ke Home"):
             st.session_state.active_room = None
             st.rerun()
             
     st.markdown("<hr style='border-color: rgba(255,255,255,0.1);'>", unsafe_allow_html=True)
     
-    # Tab Navigasi Berjenjang Sesuai Alur Kerjamu
     tab_w1, tab_w2, tab_w3 = st.tabs([
         "📂 1. Document Vault (Input Data)", 
         "📊 2. Analytics & Visuals", 
-        "🤖 3. AI Copilot & Reporting (KKA)"
+        "🤖 3. AI Copilot & Reporting"
     ])
 
     with tab_w1:
-        st.subheader("Pusat Unggah Dokumen Klien (New Data Input)")
-        st.info("Silakan masukkan data keuangan bertahap: General Ledger (GL), Trial Balance (TB), Rekening Koran, atau Stock Opname.")
+        st.markdown("<div class='glass-box'>", unsafe_allow_html=True)
+        st.subheader("Pusat Unggah Dokumen Klien (Rolling Basis)")
+        st.info("Unggah dokumen secara bertahap (GL, TB, Rekening Koran, Stock Opname, dll.). Data akan terakumulasi otomatis.")
         
         with st.form(key=f"ws_upload_{klien_ini}", clear_on_submit=True):
             uc1, uc2 = st.columns(2)
@@ -222,35 +229,37 @@ else:
                         "data": df_v,
                         "total_baris": len(df_v)
                     })
-                    st.success(f"Berhasil mengunggah {f_dok.name} ke sistem!")
+                    st.success(f"Berhasil mengunggah {f_dok.name}!")
                 except Exception as e:
                     st.error(f"Gagal memproses file: {e}")
+        st.markdown("</div>", unsafe_allow_html=True)
 
-        st.markdown("---")
-        st.write("### Daftar Dokumen Tersimpan:")
+        st.markdown("### Daftar Arsip Dokumen Masuk:")
         v_data = st.session_state.client_vault.get(klien_ini, [])
         if v_data:
             for item in v_data:
                 with st.expander(f"📄 [{item['jenis']}] — {item['nama_file']} ({item['total_baris']} Baris)"):
                     st.dataframe(item['data'].head(15), use_container_width=True)
         else:
-            st.warning("Belum ada file yang diunggah di ruang ini.")
+            st.warning("Brankas dokumen masih kosong.")
 
     with tab_w2:
-        st.subheader("Analytics Engine & Visual Grafik")
+        st.markdown("<div class='glass-box'>", unsafe_allow_html=True)
+        st.subheader("Analytics Engine & Data Visuals")
         v_data = st.session_state.client_vault.get(klien_ini, [])
         if v_data:
             f_names = [d['nama_file'] for d in v_data]
-            p_file = st.selectbox("Pilih file arsip untuk dianalisis grafiknya:", f_names)
+            p_file = st.selectbox("Pilih file arsip untuk dianalisis:", f_names)
             s_doc = next(d for d in v_data if d['nama_file'] == p_file)
             
-            st.markdown("#### 📈 Ringkasan Grafik Analitik Data")
-            # Menampilkan preview tabel data yang otomatis dikonversi jadi grafik batang sederhana di Streamlit jika ada kolom angka
+            st.markdown("#### 📈 Preview & Grafik Analitik")
             st.dataframe(s_doc['data'], use_container_width=True, height=350)
         else:
-            st.info("Silakan upload data terlebih dahulu di Tab 1 untuk melihat hasil analitiknya.")
+            st.info("Silakan lakukan upload dokumen di Tab 1 terlebih dahulu.")
+        st.markdown("</div>", unsafe_allow_html=True)
 
     with tab_w3:
+        st.markdown("<div class='glass-box'>", unsafe_allow_html=True)
         st.subheader("AI Copilot & Pembuatan KKA / Report")
         v_data = st.session_state.client_vault.get(klien_ini, [])
         
@@ -272,7 +281,7 @@ else:
             
             with chat_box:
                 with st.chat_message("ai"):
-                    with st.spinner("AI sedang memproses data dokumen..."):
+                    with st.spinner("AI sedang membaca brankas data..."):
                         try:
                             ctx = ""
                             for d in v_data:
@@ -290,8 +299,8 @@ else:
 
         st.markdown("---")
         if v_data:
-            if st.button("✨ Buat Draf Kertas Kerja Audit (KKA) & Laporan Resmi"):
-                with st.spinner("Menyusun draf laporan formal..."):
+            if st.button("✨ Buat Draf KKA & Laporan Resmi"):
+                with st.spinner("Menyusun laporan formal..."):
                     try:
                         c_rep = ""
                         for d in v_data:
@@ -305,3 +314,4 @@ else:
 
             if klien_ini in st.session_state.ai_reports:
                 st.text_area("Draf Laporan Resmi / KKA (Siap Salin):", value=st.session_state.ai_reports[klien_ini], height=250)
+        st.markdown("</div>", unsafe_allow_html=True)
