@@ -24,7 +24,7 @@ if "chat_histories" not in st.session_state:
 if "ai_reports" not in st.session_state:
     st.session_state.ai_reports = {}
 
-# --- CSS STYLING PREMIUM (HIGH-END SAAS / GLASSMORPHISM) ---
+# --- CSS STYLING: BERSIHKAN PONI PUTIH & WARNA TEKS NABRAK ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
@@ -33,17 +33,42 @@ st.markdown("""
         font-family: 'Space Grotesk', sans-serif; 
     }
     
-    /* Background Gradient Gelap Elegan */
+    /* Hilangkan total header / "poni putih" bawaan Streamlit */
+    header[data-testid="stHeader"] {
+        background: transparent !important;
+        display: none !important;
+    }
+    [data-testid="stDecoration"] {
+        display: none !important;
+    }
+    
+    /* Background Gradient Gelap */
     .stApp { 
         background: linear-gradient(135deg, #05070B 0%, #0D1124 50%, #150F2D 100%);
         color: #FFFFFF; 
+        padding-top: 1rem;
     }
     
     [data-testid="stSidebar"] {
         display: none;
     }
     
-    /* Tombol Utama Gradasi Ungu-Biru Glowing */
+    /* Paksa semua teks, label, dan paragraf menjadi terang & jelas */
+    p, span, label, div, .stMarkdown, .stSelectbox label, .stFileUploader label {
+        color: #F8FAFC !important;
+    }
+    
+    /* Kotak Info/Alert agar teksnya kontras */
+    .stAlert {
+        background-color: rgba(99, 102, 241, 0.15) !important;
+        color: #E2E8F0 !important;
+        border: 1px solid rgba(99, 102, 241, 0.3) !important;
+    }
+    .stAlert p {
+        color: #E2E8F0 !important;
+    }
+    
+    /* Tombol Utama Gradasi Ungu-Biru */
     .stButton>button { 
         background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%) !important; 
         color: #FFFFFF !important; 
@@ -59,7 +84,7 @@ st.markdown("""
         box-shadow: 0 6px 30px rgba(99, 102, 241, 0.7);
     }
     
-    /* Kartu Efek Kaca (Glassmorphism Box) */
+    /* Kartu Glassmorphism */
     .glass-box {
         background: rgba(255, 255, 255, 0.03);
         backdrop-filter: blur(20px);
@@ -70,16 +95,16 @@ st.markdown("""
         margin-bottom: 20px;
     }
     
-    /* Input Field Kustom */
+    /* Input dan Selectbox Kustom */
     .stTextInput>div>div>input, .stSelectbox>div>div>select {
-        background-color: rgba(255, 255, 255, 0.05) !important;
+        background-color: rgba(255, 255, 255, 0.06) !important;
         color: #FFFFFF !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
         border-radius: 12px !important;
     }
     
     h1, h2, h3 { 
-        color: #FFFFFF; 
+        color: #FFFFFF !important; 
         font-weight: 700; 
         letter-spacing: -0.5px; 
     }
@@ -90,7 +115,6 @@ st.markdown("""
 
 if st.session_state.active_room is None:
     # --- 1. LANDING PAGE / COVER UTAMA ---
-    
     c_nav1, c_nav2, c_nav3 = st.columns([3, 6, 2])
     with c_nav1:
         st.markdown("### ✈️ **AUDITPILOT & CO.**")
@@ -103,7 +127,6 @@ if st.session_state.active_room is None:
 
     st.markdown("<br><br>", unsafe_allow_html=True)
     
-    # Hero Title Tengah
     st.markdown("<h1 style='text-align: center; font-size: 3.8rem; background: linear-gradient(to right, #ffffff, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>Manage Your Audit Smarter</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 1.15rem; max-width: 650px; margin: 0 auto;'>Stay organized, connected, and productive with one powerful AI-driven platform designed to simplify your financial audits and compliance.</p>", unsafe_allow_html=True)
     
@@ -115,7 +138,6 @@ if st.session_state.active_room is None:
     
     st.markdown("<br><br>", unsafe_allow_html=True)
     
-    # Kartu Statistik Modern ala Cover Referensi
     col_stat1, col_stat2, col_stat3 = st.columns(3)
     
     with col_stat1:
