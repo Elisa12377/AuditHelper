@@ -60,7 +60,7 @@ if "chat_histories" not in st.session_state:
 if "ai_reports" not in st.session_state:
     st.session_state.ai_reports = {}
 
-# --- CSS STYLING: TAMPILAN GELAP ELEGAN & FIX TOTAL POPUP DROPDOWN ---
+# --- CSS STYLING: TAMPILAN GELAP ELEGAN & HILANGKAN KOTAK PUTIH DROPDOWN ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
@@ -152,9 +152,9 @@ st.markdown("""
         border-radius: 10px !important;
     }
     
-    /* --- FIX UTAMA: PAKSA KOTAK POPUP & LIST DROPDOWN JADI GELAP TOTAL DENGAN TEKS PUTIH JELAS --- */
+    /* --- FIX TOTAL KOTAK PUTIH & TEKS DROPDOWN --- */
     div[data-baseweb="select"] > div {
-        background-color: rgba(15, 23, 42, 0.95) !important;
+        background-color: rgba(15, 23, 42, 0.9) !important;
         color: #FFFFFF !important;
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
     }
@@ -162,16 +162,15 @@ st.markdown("""
         color: #FFFFFF !important;
     }
     
-    /* Menargetkan kotak menu popover yang melayang */
-    div[data-baseweb="popover"], div[data-baseweb="menu"], ul[data-baseweb="menu"] {
+    /* Menimpa container popover dropdown agar tidak putih */
+    div[data-baseweb="popover"], div[data-baseweb="menu"], ul[data-baseweb="menu"], div.baseui-menu {
         background-color: #0F172A !important;
         border: 1px solid rgba(255, 255, 255, 0.15) !important;
     }
     
-    /* Menargetkan teks di dalam pilihan dropdown */
-    div[data-baseweb="popover"] div, ul[data-baseweb="menu"] li, span[data-baseweb="tag"], div[role="option"] {
-        color: #FFFFFF !important;
+    div[data-baseweb="popover"] * {
         background-color: #0F172A !important;
+        color: #FFFFFF !important;
     }
     
     li[data-baseweb="option"], div[role="option"] {
@@ -340,14 +339,14 @@ else:
         
         tab_w1, tab_w2, tab_w3 = st.tabs([
             "📂 1. Document Vault (Input Data)", 
-            "📊 2. Analytics & Visuals", 
+            "📊 2. Analytics & Filter Visuals", 
             "🤖 3. AI Copilot & Reporting"
         ])
 
         with tab_w1:
             st.markdown("<div class='glass-box'>", unsafe_allow_html=True)
             st.subheader("Pusat Unggah Dokumen Klien (Private Vault)")
-            st.info("Data yang Anda unggah di sini aman dan hanya dapat diakses melalui akun Anda.")
+            st.info("Data yang Anda unggah dibersihkan otomatis dari baris kosong dan bebas kolom Unnamed.")
             
             with st.form(key=f"ws_upload_{klien_ini}", clear_on_submit=True):
                 uc1, uc2 = st.columns(2)
@@ -359,7 +358,12 @@ else:
                 btn_up = st.form_submit_button("Unggah ke Brankas Data")
                 if btn_up and f_dok is not None:
                     try:
-                        df_v = pd.read_excel(f_dok).astype(str)
+                        # Pembersihan Excel agar tidak ada Unnamed / baris kosong
+                        df_v = pd.read_excel(f_dok)
+                        df_v = df_v.dropna(how="all")
+                        df_v.columns = [str(col).strip() for col in df_v.columns]
+                        df_v = df_v.fillna("").astype(str)
+
                         if klien_ini not in st.session_state.client_vault:
                             st.session_state.client_vault[klien_ini] = []
                         st.session_state.client_vault[klien_ini].append({
@@ -368,7 +372,7 @@ else:
                             "data": df_v,
                             "total_baris": len(df_v)
                         })
-                        st.success(f"Berhasil mengunggah {f_dok.name}!")
+                        st.success(f"Berhasil mengunggah {f_dok.name} dengan bersih!")
                     except Exception as e:
                         st.error(f"Gagal memproses file: {e}")
             st.markdown("</div>", unsafe_allow_html=True)
@@ -384,13 +388,25 @@ else:
 
         with tab_w2:
             st.markdown("<div class='glass-box'>", unsafe_allow_html=True)
-            st.subheader("Analytics Engine & Data Visuals")
+            st.subheader("Analytics Engine & Filter Data")
             v_data = st.session_state.client_vault.get(klien_ini, [])
             if v_data:
                 f_names = [d['nama_file'] for d in v_data]
-                p_file = st.selectbox("Pilih file arsip untuk dianalisis:", f_names)
+                p_file = st.selectbox("Pilih file arsip untuk dianalisis:", f_names, key="filter_file_select")
                 s_doc = next(d for d in v_data if d['nama_file'] == p_file)
-                st.dataframe(s_doc['data'], use_container_width=True, height=350)
+                
+                df_to_show = s_doc['data']
+                
+                # Fitur Filter Pencarian Teks Interaktif
+                st.markdown("#### 🔍 Filter Kata Kunci Data")
+                keyword = st.text_input("Cari data (berdasarkan teks/angka apa saja di tabel):", placeholder="Ketik kata kunci pencarian...")
+                
+                if keyword:
+                    mask = df_to_show.apply(lambda row: row.astype(str).str.contains(keyword, case=False).any(), axis=1)
+                    df_to_show = df_to_show[mask]
+                    st.info(f"Ditemukan: {len(df_to_show)} baris dari hasil pencarian '{keyword}'.")
+                
+                st.dataframe(df_to_show, use_container_width=True, height=350)
             else:
                 st.info("Silakan lakukan upload dokumen di Tab 1 terlebih dahulu.")
             st.markdown("</div>", unsafe_allow_html=True)
