@@ -60,7 +60,7 @@ if "chat_histories" not in st.session_state:
 if "ai_reports" not in st.session_state:
     st.session_state.ai_reports = {}
 
-# --- CSS STYLING: TAMPILAN GELAP ELEGAN, KONTRAS, & FIX DROPDOWN ---
+# --- CSS STYLING: TAMPILAN GELAP ELEGAN & FIX TOTAL POPUP DROPDOWN ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
@@ -152,21 +152,34 @@ st.markdown("""
         border-radius: 10px !important;
     }
     
-    /* FIX TOTAL WARNA TEKS DI DALAM DROPDOWN SELECTBOX */
+    /* --- FIX UTAMA: PAKSA KOTAK POPUP & LIST DROPDOWN JADI GELAP TOTAL DENGAN TEKS PUTIH JELAS --- */
+    div[data-baseweb="select"] > div {
+        background-color: rgba(15, 23, 42, 0.95) !important;
+        color: #FFFFFF !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
     div[data-baseweb="select"] span {
         color: #FFFFFF !important;
     }
-    div[data-baseweb="popover"] div, ul[data-baseweb="menu"] li, span[data-baseweb="tag"] {
-        color: #0F172A !important;
+    
+    /* Menargetkan kotak menu popover yang melayang */
+    div[data-baseweb="popover"], div[data-baseweb="menu"], ul[data-baseweb="menu"] {
+        background-color: #0F172A !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
     }
-    ul[data-baseweb="menu"] {
-        background-color: #F8FAFC !important;
+    
+    /* Menargetkan teks di dalam pilihan dropdown */
+    div[data-baseweb="popover"] div, ul[data-baseweb="menu"] li, span[data-baseweb="tag"], div[role="option"] {
+        color: #FFFFFF !important;
+        background-color: #0F172A !important;
     }
-    li[data-baseweb="option"] {
-        background-color: #F8FAFC !important;
-        color: #0F172A !important;
+    
+    li[data-baseweb="option"], div[role="option"] {
+        background-color: #0F172A !important;
+        color: #FFFFFF !important;
     }
-    li[data-baseweb="option"]:hover {
+    
+    li[data-baseweb="option"]:hover, div[role="option"]:hover {
         background-color: #6366F1 !important;
         color: #FFFFFF !important;
     }
