@@ -24,7 +24,7 @@ if "chat_histories" not in st.session_state:
 if "ai_reports" not in st.session_state:
     st.session_state.ai_reports = {}
 
-# --- CSS STYLING: PERBAIKAN WARNA TOMBOL & TEKS ---
+# --- CSS STYLING: FIX TOTAL WARNA TEKS & KOTAK UPLOAD ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
@@ -51,6 +51,7 @@ st.markdown("""
         display: none;
     }
     
+    /* Paksa semua teks umum agar terang & jelas */
     p, span, label, div, .stMarkdown, .stSelectbox label, .stFileUploader label {
         color: #F8FAFC !important;
     }
@@ -64,7 +65,7 @@ st.markdown("""
         color: #E2E8F0 !important;
     }
     
-    /* TOMBOL UTAMA: Background putih/terang dengan teks HITAM tebal, tanpa efek berubah warna saat hover */
+    /* TOMBOL: Background putih, teks HITAM tebal, fix tidak transparan */
     .stButton>button { 
         background: #FFFFFF !important; 
         color: #000000 !important; 
@@ -73,18 +74,14 @@ st.markdown("""
         font-weight: 700 !important;
         padding: 0.6rem 1.4rem !important;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        transition: none !important;
-        transform: none !important;
     }
     .stButton>button p, .stButton>button span, .stButton>button div {
         color: #000000 !important;
         font-weight: 700 !important;
     }
     .stButton>button:hover { 
-        background: #F1F5F9 !important;
+        background: #E2E8F0 !important;
         color: #000000 !important;
-        transform: none !important;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
     }
     
     /* KARTU GLASSMORPHISM */
@@ -100,18 +97,24 @@ st.markdown("""
     
     /* INPUT & SELECTBOX */
     .stTextInput>div>div>input, .stSelectbox>div>div>select {
-        background-color: rgba(255, 255, 255, 0.06) !important;
+        background-color: rgba(255, 255, 255, 0.08) !important;
         color: #FFFFFF !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
         border-radius: 12px !important;
     }
     
-    /* FILE UPLOADER */
-    [data-testid="stFileUploader"] section {
-        background-color: rgba(255, 255, 255, 0.04) !important;
-        border: 1px dashed rgba(255, 255, 255, 0.2) !important;
+    /* FILE UPLOADER CONTAINER: Beri background gelap agar tombol/teks upload di dalamnya kelihatan kontras */
+    [data-testid="stFileUploader"] {
+        background-color: rgba(255, 255, 255, 0.06);
+        padding: 15px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
     }
-    [data-testid="stFileUploader"] span, [data-testid="stFileUploader"] small, [data-testid="stFileUploader"] div, [data-testid="stFileUploader"] p {
+    [data-testid="stFileUploader"] section {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        border: 1px dashed rgba(255, 255, 255, 0.3) !important;
+    }
+    [data-testid="stFileUploader"] span, [data-testid="stFileUploader"] small, [data-testid="stFileUploader"] div, [data-testid="stFileUploader"] p, [data-testid="stFileUploader"] button {
         color: #FFFFFF !important;
     }
     
@@ -348,4 +351,4 @@ else:
 
             if klien_ini in st.session_state.ai_reports:
                 st.text_area("Draf Laporan Resmi / KKA (Siap Salin):", value=st.session_state.ai_reports[klien_ini], height=250)
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True) 
